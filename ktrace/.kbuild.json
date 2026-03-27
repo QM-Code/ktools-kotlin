@@ -1,0 +1,45 @@
+{
+  "project": {
+    "title": "Karma Trace Logging SDK",
+    "id": "ktrace"
+  },
+  "git": {
+    "url": "https://github.com/QM-Code/ktrace-kotlin",
+    "auth": "git@github.com:QM-Code/ktrace-kotlin.git"
+  },
+  "kotlin": {
+    "source_roots": [
+      "src"
+    ],
+    "test_roots": [
+      "tests/src"
+    ],
+    "test_main_class": "ktrace.tests.TestMain",
+    "demo_root": "demo",
+    "dependencies": {
+      "kcli": {
+        "classes": "../kcli/build/{version}/sdk/classes"
+      }
+    }
+  },
+  "build": {
+    "demos": [
+      "bootstrap",
+      "sdk/alpha",
+      "sdk/beta",
+      "sdk/gamma",
+      "exe/core",
+      "exe/omega"
+    ],
+    "defaults": {
+      "demos": [
+        "bootstrap",
+        "sdk/alpha",
+        "sdk/beta",
+        "sdk/gamma",
+        "exe/core",
+        "exe/omega"
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+# ktools-kotlin
+
+Assume `../ktools/AGENTS.md` has already been read.
+
+`ktools-kotlin/` is the Kotlin workspace for the ktools ecosystem.
+
+## What This Level Owns
+
+This workspace owns Kotlin-specific concerns such as:
+
+- project/module layout
+- Kotlin build and test flow
+- Kotlin-specific API naming and integration patterns
+- coordination across Kotlin tool implementations when more than one repo is present
+
+Cross-language conceptual definitions belong at the overview/spec level, not here.
+
+## Current Scope
+
+This workspace currently contains:
+
+- `kcli/`
+- `ktrace/`
+
+The shared `kbuild` tool lives outside this workspace in `../kbuild/` and is
+expected on `PATH`.
+
+## Guidance For Agents
+
+1. Treat this workspace as a language root, not an implementation repo.
+2. Prefer making changes in the narrowest child repo that owns the behavior.
+3. Keep root-level changes focused on workspace coordination, documentation, and shared tooling.
+4. Read the relevant child repo `AGENTS.md` and `README.md` files before changing code there.

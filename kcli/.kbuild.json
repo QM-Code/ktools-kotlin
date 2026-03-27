@@ -1,0 +1,40 @@
+{
+  "project": {
+    "title": "Karma CLI Parsing SDK",
+    "id": "kcli"
+  },
+  "git": {
+    "url": "https://github.com/QM-Code/kcli-kotlin",
+    "auth": "git@github.com:QM-Code/kcli-kotlin.git"
+  },
+  "kotlin": {
+    "source_roots": [
+      "src"
+    ],
+    "test_roots": [
+      "tests/src"
+    ],
+    "test_main_class": "kcli.tests.TestMain",
+    "demo_root": "demo"
+  },
+  "build": {
+    "demos": [
+      "bootstrap",
+      "sdk/alpha",
+      "sdk/beta",
+      "sdk/gamma",
+      "exe/core",
+      "exe/omega"
+    ],
+    "defaults": {
+      "demos": [
+        "bootstrap",
+        "sdk/alpha",
+        "sdk/beta",
+        "sdk/gamma",
+        "exe/core",
+        "exe/omega"
+      ]
+    }
+  }
+}
