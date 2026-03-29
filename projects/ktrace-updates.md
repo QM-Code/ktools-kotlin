@@ -20,42 +20,34 @@ reference with explicit parity coverage and self-contained demos.
 
 ## Current Gaps
 
-- `ktrace/demo/sdk/common/` exists and should not.
-- A substantial amount of generated output is still tracked under
-  `ktrace/build/latest` and demo build trees.
+- Empty leftover `ktrace/demo/sdk/common/` directories are still present and
+  should be removed.
 - The implementation should be re-audited against the full C++ contract for
   selectors, output formatting, and CLI behavior.
-- README coverage should be checked so it explains the current contract and
-  layout directly.
+- `src/ktrace/internal/TraceInternals.kt` remains the densest internal file.
+- The README still carries most of the contract explanation, so docs and tests
+  should be checked to ensure behavior is explicit enough.
 
 ## Work Plan
 
-1. Clean repo hygiene.
-- Remove tracked generated output from `build/latest` and demo build trees.
-- Tighten ignore rules so build products do not return.
-- Make the handwritten source and test tree easy to scan.
+1. Finish the demo cleanup cleanly.
+- Remove the now-empty `ktrace/demo/sdk/common/` leftovers.
+- Keep bootstrap/sdk/exe demo roles obvious in the file tree.
 
-2. Eliminate shared demo code.
-- Remove `ktrace/demo/sdk/common/`.
-- Make `demo/sdk/alpha`, `demo/sdk/beta`, and `demo/sdk/gamma` self-contained.
-- Keep bootstrap-specific logic under `demo/bootstrap/`.
-- Keep executable composition logic under `demo/exe/core/` and
-  `demo/exe/omega/`.
-- Do not replace the current common module with another shared demo layer.
-
-3. Re-audit parity with C++.
+2. Re-audit parity with C++.
 - Verify channel registration, selector parsing, unmatched-selector warnings,
   logger/trace-source attachment rules, output options, `traceChanged(...)`,
   and `makeInlineParser(...)` against the C++ contract.
 - Add focused tests for any remaining implicit behavior.
 
+3. Revisit the densest internal file.
+- Review whether `TraceInternals.kt` should be split further into smaller,
+  coherent pieces.
+- Avoid file sprawl and keep the internal package story clear.
+
 4. Keep demos and docs aligned.
 - Confirm that bootstrap/sdk/exe demo roles still match the reference.
 - Update docs if any current behavior or layout still requires inference.
-
-5. Maintain a coherent internal layout.
-- Keep Kotlin internals easy to navigate.
-- Prefer small, precise edits over another broad refactor.
 
 ## Constraints
 
@@ -72,6 +64,6 @@ reference with explicit parity coverage and self-contained demos.
 
 ## Done When
 
-- Generated build output no longer dominates the repo.
-- Shared demo code is gone.
+- Leftover demo-common directories are gone.
+- Kotlin internals are easy to navigate without guesswork.
 - Tests and demos cover the reference contract directly.
