@@ -2,7 +2,6 @@ package kcli.demo.core
 
 import kcli.Parser
 import kcli.demo.alpha.AlphaSdk
-import kcli.demo.common.DemoSupport.withProgram
 
 object Main {
     @JvmStatic
@@ -29,5 +28,12 @@ object Main {
         println("Enabled inline roots:")
         println("  --alpha")
         println()
+    }
+
+    private fun withProgram(programName: String, args: Array<String>?): Array<String> {
+        val argv = Array((args?.size ?: 0) + 1) { "" }
+        argv[0] = programName
+        args?.copyInto(argv, destinationOffset = 1)
+        return argv
     }
 }

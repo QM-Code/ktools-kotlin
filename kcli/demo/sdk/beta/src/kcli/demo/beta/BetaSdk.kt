@@ -1,7 +1,7 @@
 package kcli.demo.beta
 
+import kcli.HandlerContext
 import kcli.InlineParser
-import kcli.demo.common.DemoSupport.printProcessingLine
 
 object BetaSdk {
     fun getInlineParser(): InlineParser {
@@ -12,5 +12,16 @@ object BetaSdk {
             printProcessingLine(context, value)
         }, "Set beta worker count.")
         return parser
+    }
+
+    private fun printProcessingLine(context: HandlerContext, value: String) {
+        when (context.valueTokens.size) {
+            0 -> println("Processing ${context.option}")
+            1 -> println("Processing ${context.option} with value \"$value\"")
+            else -> {
+                val joined = context.valueTokens.joinToString(",") { "\"$it\"" }
+                println("Processing ${context.option} with values [$joined]")
+            }
+        }
     }
 }

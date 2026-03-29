@@ -4,7 +4,6 @@ import kcli.InlineParser
 import kcli.Parser
 import kcli.demo.alpha.AlphaSdk
 import kcli.demo.beta.BetaSdk
-import kcli.demo.common.DemoSupport.withProgram
 import kcli.demo.gamma.GammaSdk
 
 object Main {
@@ -46,5 +45,12 @@ object Main {
         println("  --beta")
         println("  --newgamma (gamma override)")
         println()
+    }
+
+    private fun withProgram(programName: String, args: Array<String>?): Array<String> {
+        val argv = Array((args?.size ?: 0) + 1) { "" }
+        argv[0] = programName
+        args?.copyInto(argv, destinationOffset = 1)
+        return argv
     }
 }
