@@ -29,3 +29,6 @@ Useful commands:
 kbuild --build-latest
 ./build/latest/tests/run-tests
 ```
+
+After a coherent batch of changes in `ktools-kotlin/kcli/`, return to the
+`ktools-kotlin/` workspace root and run `kbuild --git-sync "<message>"`.

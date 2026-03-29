@@ -88,6 +88,14 @@ internal object TraceCliSupport {
         println("  $optionRoot '*.net.*'        Select subchannels under 'net' across namespaces")
         println("  $optionRoot '*.{net,io}'     Select 'net' and 'io' across all namespaces")
         println("  $optionRoot '{alpha,beta}.*' Select all top-level channels in alpha and beta")
+        println("  $optionRoot alpha.net")
+        println("  $optionRoot beta.scheduler.tick")
+        println("  $optionRoot alpha.net,beta.io")
+        println("  $optionRoot gamma.physics.*")
+        println("  $optionRoot gamma.physics.*.*")
+        println("  $optionRoot alpha.{net,cache}")
+        println("  $optionRoot beta.{io,scheduler}.packet")
+        println("  $optionRoot '{alpha,beta}.net'")
         println()
     }
 

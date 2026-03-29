@@ -3,6 +3,7 @@ package ktrace.tests
 object OmegaCliTests {
     fun run() {
         testBadSelector()
+        testExamplesOption()
         testExactSelectorWarning()
         testWildcardSelectorWarning()
         testFilesOption()
@@ -19,6 +20,14 @@ object OmegaCliTests {
             "[error] [cli] option '--trace': Invalid trace selector: '*' (did you mean '.*'?)",
             "invalid selector should surface a helpful error",
         )
+    }
+
+    private fun testExamplesOption() {
+        val result = TestSupport.runJava("ktrace.demo.omega.Main", "--trace-examples")
+        Assertions.expectEquals(result.exitCode, 0, "examples option should succeed")
+        Assertions.expectContains(result.stdout, "Trace selector examples:", "examples output should include the examples header")
+        Assertions.expectContains(result.stdout, "alpha.net,beta.io", "examples output should include explicit multi-selector examples")
+        Assertions.expectContains(result.stdout, "'{alpha,beta}.net'", "examples output should include brace namespace examples")
     }
 
     private fun testExactSelectorWarning() {

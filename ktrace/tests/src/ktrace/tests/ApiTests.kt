@@ -15,6 +15,7 @@ object ApiTests {
         testTraceOutput()
         testSelectorSemantics()
         testConflictingColorsRejected()
+        testTraceLoggerAttachmentRejected()
         testTraceChangedSuppressesDuplicates()
         testTraceChangedThreadSafety()
     }
@@ -39,6 +40,15 @@ object ApiTests {
         Assertions.expectThrows<IllegalArgumentException>("missing arguments should fail") {
             TraceInternals.formatMessage("value {} {}", 7)
         }
+        Assertions.expectThrows<IllegalArgumentException>("extra arguments should fail") {
+            TraceInternals.formatMessage("value", 7)
+        }
+        Assertions.expectThrows<IllegalArgumentException>("unterminated open brace should fail") {
+            TraceInternals.formatMessage("{")
+        }
+        Assertions.expectThrows<IllegalArgumentException>("unmatched closing brace should fail") {
+            TraceInternals.formatMessage("}")
+        }
         Assertions.expectThrows<IllegalArgumentException>("unsupported tokens should fail") {
             TraceInternals.formatMessage("{:x}", 7)
         }
@@ -61,6 +71,9 @@ object ApiTests {
         Assertions.expectContains(text, "[tests] [error]", "error output should include severity")
         Assertions.expectContains(text, "warn value 7", "warn output should include formatted value")
         Assertions.expectContains(text, "[ApiTests:", "output should include source labels when enabled")
+        Assertions.expectNotContains(text, "[info] [tests] [info]", "info output should not duplicate severity prefixes")
+        Assertions.expectNotContains(text, "[warning] [tests] [warning]", "warn output should not duplicate severity prefixes")
+        Assertions.expectNotContains(text, "[error] [tests] [error]", "error output should not duplicate severity prefixes")
     }
 
     private fun testTraceOutput() {
@@ -100,6 +113,12 @@ object ApiTests {
         logger.enableChannels("*.*.*.*")
         Assertions.expect(logger.shouldTraceChannel("tests.store.requests"), "depth3 wildcard should enable nested channel")
         Assertions.expect(!logger.shouldTraceChannel("tests.bad name"), "invalid names should never trace")
+
+        logger.enableChannel("tests.missing.child")
+        Assertions.expect(!logger.shouldTraceChannel("tests.missing.child"), "missing exact channels should remain disabled")
+
+        logger.enableChannels("tests.missing.child")
+        Assertions.expect(!logger.shouldTraceChannel("tests.missing.child"), "unresolved exact selectors should remain disabled")
     }
 
     private fun testConflictingColorsRejected() {
@@ -117,6 +136,18 @@ object ApiTests {
         conflicting.addChannel("net", TraceColors.color("Orange3"))
         Assertions.expectThrows<IllegalArgumentException>("conflicting colors should be rejected") {
             logger.addTraceLogger(conflicting)
+        }
+    }
+
+    private fun testTraceLoggerAttachmentRejected() {
+        val firstLogger = Logger()
+        val secondLogger = Logger()
+        val trace = TraceLogger("tests")
+        trace.addChannel("net")
+
+        firstLogger.addTraceLogger(trace)
+        Assertions.expectThrows<IllegalArgumentException>("trace loggers should not attach to multiple loggers") {
+            secondLogger.addTraceLogger(trace)
         }
     }
 

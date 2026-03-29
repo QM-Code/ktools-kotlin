@@ -2,9 +2,8 @@
 
 ## Mission
 
-Bring `ktools-kotlin/kcli/` fully up to the C++ reference standard. Kotlin is
-already structurally strong, so the emphasis is on repo hygiene, finishing the
-public API split, and validating behavior parity.
+Keep `ktools-kotlin/kcli/` as a clean, Kotlin-idiomatic peer to the C++
+reference with explicit public/internal boundaries and strong parity coverage.
 
 ## Required Reading
 
@@ -18,45 +17,46 @@ public API split, and validating behavior parity.
 
 ## Current Gaps
 
-- The overall source/test/demo layout is strong and close to Java/C++.
-- The public API is still concentrated more than it should be in
-  `kcli/src/kcli/Parser.kt`.
-- Tracked generated output exists in `kcli/build/latest` and
-  `kcli/demo/**/build/latest`.
-- Behavior parity with the C++ docs and tests should be re-audited after any
-  structural cleanup.
+- `kcli/src/kcli/internal/Model.kt` still bundles many internal types into one
+  file.
+- API behavior coverage is still concentrated in `tests/src/kcli/tests/ApiTests.kt`
+  even though the demo CLI tests are separate.
+- The implementation should be re-audited against the full C++ contract now
+  that the public API split is clearer.
+- Docs and demos should be checked to make sure they describe the current file
+  layout directly.
 
 ## Work Plan
 
-1. Finish the public API layout.
-- Split `Parser.kt` if doing so improves readability and discoverability.
-- Prefer dedicated files for `Parser`, `InlineParser`, `CliError`,
-  `HandlerContext`, and handler interfaces if the split remains coherent.
-- Keep the internal package structure intact.
+1. Revisit the internal model layout.
+- Review whether splitting `internal/Model.kt` would make the repo easier to
+  navigate.
+- Keep the current internal package structure coherent and avoid file sprawl.
 
-2. Preserve the good internal structure.
-- Keep `internal/` focused on model, normalization, registration, parse engine,
-  and help rendering.
-- Only split internal files further where a file is doing clearly too much.
+2. Tighten test organization where it helps.
+- Consider splitting `ApiTests.kt` by concern if that would make failures
+  easier to localize.
+- Preserve the existing demo CLI coverage.
 
-3. Clean repo hygiene.
-- Remove tracked build output from source control where possible.
-- Keep the hand-written source tree easy to navigate.
+3. Re-audit parity with C++.
+- Verify aliases, inline roots, bare-root help, required/optional values,
+  double-dash rejection, error behavior, and validation-before-handlers against
+  the C++ docs and case list.
+- Add focused tests for any remaining implicit behavior.
 
-4. Lock down behavior parity.
-- Confirm that help output, alias semantics, optional/required value handling,
-  bare inline roots, and error semantics match the reference.
-- Add targeted tests for any reference behavior that is not explicitly covered.
+4. Keep demos and docs aligned.
+- Confirm that bootstrap/sdk/exe demo roles still match the reference.
+- Update docs if any current behavior or layout still requires inference.
 
-5. Keep demos aligned with C++.
-- Preserve the current bootstrap/sdk/exe demo topology.
-- Use the demos as a contract check, not as disposable examples.
+5. Maintain repo hygiene.
+- Keep generated output out of version control.
+- Make the handwritten source and test tree easy to scan.
 
 ## Constraints
 
 - Preserve Kotlin-idiomatic APIs while keeping conceptual parity with C++.
-- Do not replace the current clean package split with flatter file sprawl.
-- Prefer precise refactors over broad rewrites.
+- Do not flatten the current package structure unnecessarily.
+- Prefer small, precise edits over another broad refactor.
 
 ## Validation
 
@@ -67,6 +67,6 @@ public API split, and validating behavior parity.
 
 ## Done When
 
-- The public API is easier to navigate than it is today.
-- Generated output no longer dominates the repo structure.
-- Kotlin remains one of the closest structural matches to the C++ reference.
+- Internal types are easy to find.
+- Tests and demos cover the reference contract directly.
+- Docs describe the current repo shape without stale assumptions.

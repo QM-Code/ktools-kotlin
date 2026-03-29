@@ -5,7 +5,6 @@ import ktrace.Logger
 import ktrace.TraceColors
 import ktrace.TraceLogger
 import ktrace.demo.alpha.AlphaSdk
-import ktrace.demo.common.DemoSupport.withProgram
 
 object Main {
     @JvmStatic
@@ -24,8 +23,7 @@ object Main {
 
         val parser = Parser()
         parser.addInlineParser(logger.makeInlineParser(trace))
-        val argv = withProgram("ktrace_demo_core", args)
-        parser.parseOrExit(argv.size, argv)
+        parser.parseOrExit(args)
 
         trace.trace("app", "cli processing enabled, use --trace for options")
         trace.trace("startup", "testing imported tracing, use --trace '*.*' to view imported channels")
