@@ -97,7 +97,7 @@ Useful demo commands:
 
 ## Repository Layout
 
-- Public API: `src/kcli/Parser.kt`
+- Public API: `src/kcli/{Parser,InlineParser,HandlerContext,CliError,Handlers}.kt`
 - Parser internals: `src/kcli/internal/`
 - API and CLI coverage: `tests/src/`
 - Integration demos: `demo/`

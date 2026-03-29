@@ -1,6 +1,6 @@
 # Build directories
-/build/
-/demo/**/build/
+/*/build/
+/*/demo/**/build/
 
 # Python caches
 __pycache__/

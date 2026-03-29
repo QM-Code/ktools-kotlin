@@ -83,4 +83,5 @@ If you want to see complete, compiling examples, start with:
 - [`demo/exe/omega/src/kcli/demo/omega/Main.kt`](../demo/exe/omega/src/kcli/demo/omega/Main.kt)
 - [`tests/src/kcli/tests/ApiTests.kt`](../tests/src/kcli/tests/ApiTests.kt)
 
-The public API contract lives in [`src/kcli/Parser.kt`](../src/kcli/Parser.kt).
+The public API contract lives in [`src/kcli/`](../src/kcli/), with `Parser.kt`
+and `InlineParser.kt` as the main entry points.

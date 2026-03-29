@@ -1,6 +1,14 @@
 # API Guide
 
-This page summarizes the public types in [`src/kcli/Parser.kt`](../src/kcli/Parser.kt).
+This page summarizes the public types in [`src/kcli/`](../src/kcli/).
+
+The public API is split across:
+
+- `Parser.kt`
+- `InlineParser.kt`
+- `HandlerContext.kt`
+- `CliError.kt`
+- `Handlers.kt`
 
 ## Core Types
 
@@ -149,4 +157,4 @@ Use the registration form that matches the CLI contract you want:
 
 - `Parser` keeps its own internal registration state.
 - `InlineParser.copy()` returns a deep copy suitable for registering or retargeting under a new root.
-- The public Kotlin source file is intended to be the source-of-truth contract for library consumers.
+- The public Kotlin source directory is intended to be the source-of-truth contract for library consumers.

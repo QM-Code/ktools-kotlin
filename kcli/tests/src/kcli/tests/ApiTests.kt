@@ -13,8 +13,14 @@ object ApiTests {
         testAliasPresetTokensSatisfyRequiredValue()
         testAliasPresetTokensApplyToInlineRootValue()
         testAliasPresetTokensRejectedForFlags()
+        testParserCanBeReusedAcrossParses()
         testRequiredValueAcceptsOptionLikeFirstToken()
         testBareInlineRootPrintsHelp()
+        testInlineRootHelpIncludesRootValueRow()
+        testOptionalValueAcceptsExplicitEmptyToken()
+        testPositionalHandlerPreservesExplicitEmptyTokens()
+        testOptionHandlerExceptionSurfacesAsCliError()
+        testInlineRootOverrideApplies()
         testDoubleDashRemainsUnknown()
     }
 
@@ -132,6 +138,23 @@ object ApiTests {
         Assertions.expectContains(error.message, "does not accept values", "error should explain flag preset rejection")
     }
 
+    private fun testParserCanBeReusedAcrossParses() {
+        val firstArgv = arrayOf("prog", "-v")
+        val secondArgv = arrayOf("prog", "-v")
+        var calls = 0
+
+        val parser = Parser()
+        parser.addAlias("-v", "--verbose")
+        parser.setHandler("--verbose", { _ -> calls += 1 }, "Enable verbose logging.")
+
+        parser.parseOrThrow(firstArgv.size, firstArgv)
+        parser.parseOrThrow(secondArgv.size, secondArgv)
+
+        Assertions.expectEquals(calls, 2, "parser instances should remain reusable across parses")
+        Assertions.expectEquals(firstArgv.toList(), listOf("prog", "-v"), "first argv should remain unchanged")
+        Assertions.expectEquals(secondArgv.toList(), listOf("prog", "-v"), "second argv should remain unchanged")
+    }
+
     private fun testRequiredValueAcceptsOptionLikeFirstToken() {
         val argv = arrayOf("prog", "--output", "-v")
         var value = ""
@@ -162,6 +185,91 @@ object ApiTests {
 
         Assertions.expectContains(stdout, "Available --alpha-* options:", "bare inline root should print help")
         Assertions.expectContains(stdout, "--alpha-enable [value]", "help should include optional value syntax")
+    }
+
+    private fun testInlineRootHelpIncludesRootValueRow() {
+        val argv = arrayOf("prog", "--build")
+        val parser = Parser()
+        val build = InlineParser("--build")
+        build.setRootValueHandler({ _, _ -> }, "<selector>", "Select build targets.")
+        build.setHandler("-flag", { _ -> }, "Enable build flag.")
+        parser.addInlineParser(build)
+
+        val stdout = TestSupport.captureStdout {
+            parser.parseOrThrow(argv.size, argv)
+        }
+
+        Assertions.expectContains(stdout, "--build <selector>", "bare root help should include root value syntax")
+        Assertions.expectContains(stdout, "Select build targets.", "bare root help should include root value description")
+    }
+
+    private fun testOptionalValueAcceptsExplicitEmptyToken() {
+        val argv = arrayOf("prog", "--alpha-enable", "")
+        var value = "unexpected"
+        val tokens = mutableListOf<String>()
+
+        val parser = Parser()
+        val alpha = InlineParser("--alpha")
+        alpha.setOptionalValueHandler("-enable", { context, captured ->
+            value = captured
+            tokens.addAll(context.valueTokens)
+        }, "Enable alpha processing.")
+        parser.addInlineParser(alpha)
+        parser.parseOrThrow(argv.size, argv)
+
+        Assertions.expectEquals(value, "", "explicit empty optional values should remain empty")
+        Assertions.expectEquals(tokens, listOf(""), "context tokens should preserve explicit empty optional values")
+        Assertions.expectEquals(argv.toList(), listOf("prog", "--alpha-enable", ""), "argv should remain unchanged")
+    }
+
+    private fun testPositionalHandlerPreservesExplicitEmptyTokens() {
+        val argv = arrayOf("prog", "", "tail")
+        val positionals = mutableListOf<String>()
+
+        val parser = Parser()
+        parser.setPositionalHandler { context ->
+            positionals.addAll(context.valueTokens)
+        }
+        parser.parseOrThrow(argv.size, argv)
+
+        Assertions.expectEquals(positionals, listOf("", "tail"), "positionals should preserve explicit empty tokens")
+        Assertions.expectEquals(argv.toList(), listOf("prog", "", "tail"), "argv should remain unchanged")
+    }
+
+    private fun testOptionHandlerExceptionSurfacesAsCliError() {
+        val argv = arrayOf("prog", "--verbose")
+        val parser = Parser()
+        parser.setHandler("--verbose", { _ ->
+            throw IllegalStateException("option boom")
+        }, "Enable verbose logging.")
+
+        val error = Assertions.expectThrows<CliError>(
+            "handler exceptions should surface as CliError",
+        ) {
+            parser.parseOrThrow(argv.size, argv)
+        }
+
+        Assertions.expectEquals(error.option, "--verbose", "handler failures should report the option")
+        Assertions.expectContains(error.message, "option boom", "handler error text should be preserved")
+    }
+
+    private fun testInlineRootOverrideApplies() {
+        val argv = arrayOf("prog", "--newgamma-tag", "prod")
+        var value = ""
+
+        val parser = Parser()
+        val gamma = InlineParser("--gamma")
+        gamma.setHandler("-tag", { _, captured -> value = captured }, "Set gamma tag.")
+        gamma.setRoot("--newgamma")
+        parser.addInlineParser(gamma)
+        parser.parseOrThrow(argv.size, argv)
+
+        Assertions.expectEquals(value, "prod", "overridden inline roots should dispatch registered handlers")
+        Assertions.expectEquals(
+            argv.toList(),
+            listOf("prog", "--newgamma-tag", "prod"),
+            "argv should remain unchanged after overridden root dispatch",
+        )
     }
 
     private fun testDoubleDashRemainsUnknown() {
