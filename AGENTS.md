@@ -31,3 +31,14 @@ expected on `PATH`.
 2. Prefer making changes in the narrowest child repo that owns the behavior.
 3. Keep root-level changes focused on workspace coordination, documentation, and shared tooling.
 4. Read the relevant child repo `AGENTS.md` and `README.md` files before changing code there.
+
+## Git Sync
+
+Use the shared `kbuild` workflow for commit/push sync from this workspace root:
+
+```bash
+kbuild --git-sync "<message>"
+```
+
+Treat that as the standard sync command unless a more local doc explicitly
+overrides it.
