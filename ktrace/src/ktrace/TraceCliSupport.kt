@@ -29,7 +29,7 @@ internal object TraceCliSupport {
                         filenames = true,
                         lineNumbers = true,
                         functionNames = false,
-                        timestamps = logger.getOutputOptions().timestamps,
+                        timestamps = logger.outputOptions.timestamps,
                     ),
                 )
             },
@@ -43,7 +43,7 @@ internal object TraceCliSupport {
                         filenames = true,
                         lineNumbers = true,
                         functionNames = true,
-                        timestamps = logger.getOutputOptions().timestamps,
+                        timestamps = logger.outputOptions.timestamps,
                     ),
                 )
             },
@@ -52,7 +52,7 @@ internal object TraceCliSupport {
         parser.setHandler(
             "-timestamps",
             { _ ->
-                val options = logger.getOutputOptions()
+                val options = logger.outputOptions
                 logger.setOutputOptions(
                     OutputOptions(
                         filenames = options.filenames,
@@ -100,7 +100,7 @@ internal object TraceCliSupport {
     }
 
     private fun handleNamespaces(logger: Logger) {
-        val namespaces = logger.getNamespaces()
+        val namespaces = logger.namespaces
         if (namespaces.isEmpty()) {
             println("No trace namespaces defined.")
             println()
@@ -117,8 +117,8 @@ internal object TraceCliSupport {
 
     private fun handleChannels(logger: Logger) {
         var printedAny = false
-        for (traceNamespace in logger.getNamespaces()) {
-            for (channel in logger.getChannels(traceNamespace)) {
+        for (traceNamespace in logger.namespaces) {
+            for (channel in logger.channels(traceNamespace)) {
                 if (!printedAny) {
                     println()
                     println("Available trace channels:")

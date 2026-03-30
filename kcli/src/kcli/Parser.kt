@@ -44,23 +44,33 @@ class Parser {
     }
 
     fun parseOrExit(args: Array<String>?) {
+        parseOrExit(args?.asList())
+    }
+
+    fun parseOrThrow(args: Array<String>?) {
+        parseOrThrow(args?.asList())
+    }
+
+    fun parseOrExit(args: List<String>?) {
         val argv = withProgramToken(args)
         parseOrExit(argv?.size ?: 0, argv)
     }
 
-    fun parseOrThrow(args: Array<String>?) {
+    fun parseOrThrow(args: List<String>?) {
         val argv = withProgramToken(args)
         parseOrThrow(argv?.size ?: 0, argv)
     }
 
-    private fun withProgramToken(args: Array<String>?): Array<String>? {
+    private fun withProgramToken(args: List<String>?): Array<String>? {
         if (args == null) {
             return null
         }
 
         val argv = Array(args.size + 1) { "" }
         argv[0] = ""
-        args.copyInto(argv, destinationOffset = 1)
+        for ((index, arg) in args.withIndex()) {
+            argv[index + 1] = arg
+        }
         return argv
     }
 }

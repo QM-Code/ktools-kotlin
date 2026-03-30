@@ -9,8 +9,6 @@ import kcli.demo.gamma.GammaSdk
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        val argv = withProgram("kcli_demo_omega", args)
-
         val parser = Parser()
         val alphaParser = AlphaSdk.getInlineParser()
         val betaParser = BetaSdk.getInlineParser()
@@ -34,7 +32,7 @@ object Main {
         parser.setHandler("--output", { _, _ -> }, "Set app output target.")
         parser.setPositionalHandler { _ -> }
 
-        parser.parseOrExit(argv.size, argv)
+        parser.parseOrExit(args.toList())
 
         println()
         println("Usage:")
@@ -45,12 +43,5 @@ object Main {
         println("  --beta")
         println("  --newgamma (gamma override)")
         println()
-    }
-
-    private fun withProgram(programName: String, args: Array<String>?): Array<String> {
-        val argv = Array((args?.size ?: 0) + 1) { "" }
-        argv[0] = programName
-        args?.copyInto(argv, destinationOffset = 1)
-        return argv
     }
 }

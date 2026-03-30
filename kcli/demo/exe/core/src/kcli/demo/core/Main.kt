@@ -7,7 +7,6 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
         val exeName = "kcli_demo_core"
-        val argv = withProgram(exeName, args)
 
         val parser = Parser()
         parser.addInlineParser(AlphaSdk.getInlineParser())
@@ -16,7 +15,7 @@ object Main {
         parser.addAlias("-a", "--alpha-enable")
         parser.setHandler("--verbose", { _ -> }, "Enable verbose app logging.")
         parser.setHandler("--output", { _, _ -> }, "Set app output target.")
-        parser.parseOrExit(argv.size, argv)
+        parser.parseOrExit(args.toList())
 
         println()
         println("KCLI kotlin demo core import/integration check passed")
@@ -28,12 +27,5 @@ object Main {
         println("Enabled inline roots:")
         println("  --alpha")
         println()
-    }
-
-    private fun withProgram(programName: String, args: Array<String>?): Array<String> {
-        val argv = Array((args?.size ?: 0) + 1) { "" }
-        argv[0] = programName
-        args?.copyInto(argv, destinationOffset = 1)
-        return argv
     }
 }

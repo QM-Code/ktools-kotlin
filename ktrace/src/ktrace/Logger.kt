@@ -37,7 +37,8 @@ class TraceLogger(traceNamespace: String) {
         TraceInternals.addChannel(data, channel, color)
     }
 
-    fun getNamespace(): String = data.traceNamespace
+    val namespace: String
+        get() = data.traceNamespace
 
     fun shouldTraceChannel(channel: String): Boolean = TraceInternals.shouldTraceChannel(data, channel)
 
@@ -106,43 +107,43 @@ class Logger {
         enableChannel(qualifiedChannel, "")
     }
 
-    fun enableChannel(localTraceLogger: TraceLogger?, qualifiedChannel: String) {
-        enableChannel(qualifiedChannel, localTraceLogger?.getNamespace().orEmpty())
+    fun enableChannel(localTraceLogger: TraceLogger, qualifiedChannel: String) {
+        enableChannel(qualifiedChannel, localTraceLogger.namespace)
     }
 
     fun enableChannels(selectorsCsv: String) {
         enableChannels(selectorsCsv, "")
     }
 
-    fun enableChannels(localTraceLogger: TraceLogger?, selectorsCsv: String) {
-        enableChannels(selectorsCsv, localTraceLogger?.getNamespace().orEmpty())
+    fun enableChannels(localTraceLogger: TraceLogger, selectorsCsv: String) {
+        enableChannels(selectorsCsv, localTraceLogger.namespace)
     }
 
     fun shouldTraceChannel(qualifiedChannel: String): Boolean = shouldTraceChannel(qualifiedChannel, "")
 
-    fun shouldTraceChannel(localTraceLogger: TraceLogger?, qualifiedChannel: String): Boolean =
-        shouldTraceChannel(qualifiedChannel, localTraceLogger?.getNamespace().orEmpty())
+    fun shouldTraceChannel(localTraceLogger: TraceLogger, qualifiedChannel: String): Boolean =
+        shouldTraceChannel(qualifiedChannel, localTraceLogger.namespace)
 
     fun disableChannel(qualifiedChannel: String) {
         disableChannel(qualifiedChannel, "")
     }
 
-    fun disableChannel(localTraceLogger: TraceLogger?, qualifiedChannel: String) {
-        disableChannel(qualifiedChannel, localTraceLogger?.getNamespace().orEmpty())
+    fun disableChannel(localTraceLogger: TraceLogger, qualifiedChannel: String) {
+        disableChannel(qualifiedChannel, localTraceLogger.namespace)
     }
 
     fun disableChannels(selectorsCsv: String) {
         disableChannels(selectorsCsv, "")
     }
 
-    fun disableChannels(localTraceLogger: TraceLogger?, selectorsCsv: String) {
-        disableChannels(selectorsCsv, localTraceLogger?.getNamespace().orEmpty())
+    fun disableChannels(localTraceLogger: TraceLogger, selectorsCsv: String) {
+        disableChannels(selectorsCsv, localTraceLogger.namespace)
     }
 
     fun setOutputOptions(options: OutputOptions) {
         TraceInternals.setOutputOptions(data, options)
         internalTrace.trace("api", "updating output options (enable api.output for details)")
-        val next = getOutputOptions()
+        val next = outputOptions
         internalTrace.trace(
             "api.output",
             "set output options: filenames={} line_numbers={} function_names={} timestamps={}",
@@ -153,16 +154,21 @@ class Logger {
         )
     }
 
-    fun getOutputOptions(): OutputOptions = TraceInternals.getOutputOptions(data)
+    val outputOptions: OutputOptions
+        get() = TraceInternals.getOutputOptions(data)
 
-    fun getNamespaces(): List<String> = TraceInternals.getNamespaces(data)
+    val namespaces: List<String>
+        get() = TraceInternals.getNamespaces(data)
 
-    fun getChannels(traceNamespace: String): List<String> = TraceInternals.getChannels(data, traceNamespace)
+    fun channels(traceNamespace: String): List<String> = TraceInternals.getChannels(data, traceNamespace)
 
     fun makeInlineParser(localTraceLogger: TraceLogger): InlineParser = makeInlineParser(localTraceLogger, "trace")
 
-    fun makeInlineParser(localTraceLogger: TraceLogger?, traceRoot: String): InlineParser =
+    fun makeInlineParser(localTraceLogger: TraceLogger, traceRoot: String): InlineParser =
         TraceCliSupport.makeInlineParser(this, localTraceLogger, traceRoot)
+
+    fun makeInlineParser(traceRoot: String): InlineParser =
+        TraceCliSupport.makeInlineParser(this, null, traceRoot)
 
     private fun enableChannel(qualifiedChannel: String, localNamespace: String) {
         val resolution = TraceInternals.resolveExactChannel(data, qualifiedChannel, localNamespace)

@@ -8,34 +8,16 @@ enum class ValueArity {
     OPTIONAL,
 }
 
-class CommandBinding {
-    var expectsValue = false
-    var flagHandler: FlagHandler? = null
-    var valueHandler: ValueHandler? = null
-    var valueArity: ValueArity = ValueArity.REQUIRED
-    var description = ""
+data class CommandBinding(
+    var expectsValue: Boolean = false,
+    var flagHandler: FlagHandler? = null,
+    var valueHandler: ValueHandler? = null,
+    var valueArity: ValueArity = ValueArity.REQUIRED,
+    var description: String = "",
+)
 
-    fun copy(): CommandBinding {
-        val copy = CommandBinding()
-        copy.expectsValue = expectsValue
-        copy.flagHandler = flagHandler
-        copy.valueHandler = valueHandler
-        copy.valueArity = valueArity
-        copy.description = description
-        return copy
-    }
-}
-
-class AliasBinding {
-    var alias = ""
-    var targetToken = ""
-    val presetTokens = mutableListOf<String>()
-
-    fun copy(): AliasBinding {
-        val copy = AliasBinding()
-        copy.alias = alias
-        copy.targetToken = targetToken
-        copy.presetTokens.addAll(presetTokens)
-        return copy
-    }
-}
+data class AliasBinding(
+    var alias: String = "",
+    var targetToken: String = "",
+    val presetTokens: MutableList<String> = mutableListOf(),
+)
