@@ -6,30 +6,30 @@ import java.util.Locale
 
 object TraceOutputSupport {
     fun emitTrace(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         traceNamespace: String,
         channel: String,
-        callSite: TraceInternals.CallSite,
+        callSite: CallSite,
         message: String,
     ) {
         emitLine(loggerData, buildTraceMessagePrefix(loggerData, traceNamespace, channel, callSite), message, System.out)
     }
 
     fun emitLog(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         traceNamespace: String,
-        severity: TraceInternals.LogSeverity,
-        callSite: TraceInternals.CallSite,
+        severity: LogSeverity,
+        callSite: CallSite,
         message: String,
     ) {
         emitLine(loggerData, buildLogMessagePrefix(loggerData, traceNamespace, severity, callSite), message, System.out)
     }
 
     fun buildTraceMessagePrefix(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         traceNamespace: String,
         channel: String,
-        callSite: TraceInternals.CallSite,
+        callSite: CallSite,
     ): String {
         val out = StringBuilder()
         appendNamespace(out, traceNamespace)
@@ -40,10 +40,10 @@ object TraceOutputSupport {
     }
 
     fun buildLogMessagePrefix(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         traceNamespace: String,
-        severity: TraceInternals.LogSeverity,
-        callSite: TraceInternals.CallSite,
+        severity: LogSeverity,
+        callSite: CallSite,
     ): String {
         val out = StringBuilder()
         appendNamespace(out, traceNamespace)
@@ -53,7 +53,7 @@ object TraceOutputSupport {
         return out.toString()
     }
 
-    private fun emitLine(loggerData: TraceInternals.LoggerData, prefix: String, message: String, out: PrintStream) {
+    private fun emitLine(loggerData: LoggerData, prefix: String, message: String, out: PrintStream) {
         synchronized(loggerData.outputLock) {
             out.print(prefix)
             out.print(' ')
@@ -70,7 +70,7 @@ object TraceOutputSupport {
         out.append('[').append(traceNamespace).append("] ")
     }
 
-    private fun appendTimestamp(loggerData: TraceInternals.LoggerData, out: StringBuilder) {
+    private fun appendTimestamp(loggerData: LoggerData, out: StringBuilder) {
         if (!loggerData.timestampsEnabled) {
             return
         }
@@ -83,9 +83,9 @@ object TraceOutputSupport {
     }
 
     private fun appendLocation(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         out: StringBuilder,
-        callSite: TraceInternals.CallSite,
+        callSite: CallSite,
     ) {
         if (!loggerData.filenamesEnabled) {
             return

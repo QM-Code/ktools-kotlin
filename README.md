@@ -13,7 +13,7 @@ This workspace currently contains:
 
 ## Where To Go Next
 
-Use the child repos for concrete API and implementation details:
+Use the child components for concrete API and implementation details:
 
 - [kcli](kcli)
 - [ktrace](ktrace)

@@ -1,7 +1,7 @@
 package ktrace.internal
 
 object TraceFormatSupport {
-    fun captureCallSite(): TraceInternals.CallSite {
+    fun captureCallSite(): CallSite {
         val frames = Thread.currentThread().stackTrace
         var sawPublicApi = false
         for (frame in frames) {
@@ -16,16 +16,16 @@ object TraceFormatSupport {
             if (!sawPublicApi) {
                 continue
             }
-            return TraceInternals.CallSite(
+            return CallSite(
                 fileName = simplifyFileName(frame.fileName, className),
                 lineNumber = frame.lineNumber,
                 methodName = frame.methodName,
             )
         }
-        return TraceInternals.CallSite("unknown", -1, "")
+        return CallSite("unknown", -1, "")
     }
 
-    fun makeTraceChangedSiteKey(channel: String, callSite: TraceInternals.CallSite): String =
+    fun makeTraceChangedSiteKey(channel: String, callSite: CallSite): String =
         "${callSite.fileName}:${callSite.lineNumber}:${callSite.methodName}:$channel"
 
     fun formatArgument(value: Any?): String = value.toString()

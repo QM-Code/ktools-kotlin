@@ -4,7 +4,7 @@ import ktrace.OutputOptions
 import ktrace.TraceColors
 
 object TraceRegistrySupport {
-    fun addChannel(data: TraceInternals.TraceLoggerData, channel: String, color: Int) {
+    fun addChannel(data: TraceLoggerData, channel: String, color: Int) {
         val traceNamespace = TraceNamingSupport.normalizeNamespace(data.traceNamespace)
         val channelName = TraceNamingSupport.normalizeChannel(channel)
         val parentSeparator = channelName.lastIndexOf('.')
@@ -19,16 +19,16 @@ object TraceRegistrySupport {
         if (existing != null) {
             val merged = mergeColor(existing.color, color, traceNamespace, channelName)
             if (merged != existing.color) {
-                data.channels[data.channels.indexOf(existing)] = TraceInternals.ChannelSpec(existing.name, merged)
+                data.channels[data.channels.indexOf(existing)] = ChannelSpec(existing.name, merged)
             }
             return
         }
 
         require(color == TraceColors.DEFAULT || color in 0..255) { "invalid trace color id '$color'" }
-        data.channels.add(TraceInternals.ChannelSpec(channelName, color))
+        data.channels.add(ChannelSpec(channelName, color))
     }
 
-    fun ensureTraceLoggerCanAttach(traceLogger: TraceInternals.TraceLoggerData, loggerData: TraceInternals.LoggerData) {
+    fun ensureTraceLoggerCanAttach(traceLogger: TraceLoggerData, loggerData: LoggerData) {
         synchronized(traceLogger.attachedLoggerLock) {
             val attached = traceLogger.attachedLoggerRef.get()
             require(attached == null || attached === loggerData) {
@@ -37,7 +37,7 @@ object TraceRegistrySupport {
         }
     }
 
-    fun attachTraceLogger(traceLogger: TraceInternals.TraceLoggerData, loggerData: TraceInternals.LoggerData) {
+    fun attachTraceLogger(traceLogger: TraceLoggerData, loggerData: LoggerData) {
         synchronized(traceLogger.attachedLoggerLock) {
             val attached = traceLogger.attachedLoggerRef.get()
             require(attached == null || attached === loggerData) {
@@ -47,10 +47,10 @@ object TraceRegistrySupport {
         }
     }
 
-    fun attachedLogger(traceLogger: TraceInternals.TraceLoggerData): TraceInternals.LoggerData? =
+    fun attachedLogger(traceLogger: TraceLoggerData): LoggerData? =
         synchronized(traceLogger.attachedLoggerLock) { traceLogger.attachedLoggerRef.get() }
 
-    fun mergeTraceLogger(loggerData: TraceInternals.LoggerData, traceLogger: TraceInternals.TraceLoggerData) {
+    fun mergeTraceLogger(loggerData: LoggerData, traceLogger: TraceLoggerData) {
         val traceNamespace = TraceNamingSupport.normalizeNamespace(traceLogger.traceNamespace)
         synchronized(loggerData.registryLock) {
             loggerData.namespaces.add(traceNamespace)
@@ -77,7 +77,7 @@ object TraceRegistrySupport {
         }
     }
 
-    fun retainTraceLogger(loggerData: TraceInternals.LoggerData, traceLogger: TraceInternals.TraceLoggerData) {
+    fun retainTraceLogger(loggerData: LoggerData, traceLogger: TraceLoggerData) {
         synchronized(loggerData.registryLock) {
             if (!loggerData.attachedTraceLoggers.contains(traceLogger)) {
                 loggerData.attachedTraceLoggers.add(traceLogger)
@@ -85,7 +85,7 @@ object TraceRegistrySupport {
         }
     }
 
-    fun getOutputOptions(loggerData: TraceInternals.LoggerData): OutputOptions =
+    fun getOutputOptions(loggerData: LoggerData): OutputOptions =
         OutputOptions(
             filenames = loggerData.filenamesEnabled,
             lineNumbers = loggerData.lineNumbersEnabled,
@@ -93,24 +93,24 @@ object TraceRegistrySupport {
             timestamps = loggerData.timestampsEnabled,
         )
 
-    fun setOutputOptions(loggerData: TraceInternals.LoggerData, options: OutputOptions) {
+    fun setOutputOptions(loggerData: LoggerData, options: OutputOptions) {
         loggerData.filenamesEnabled = options.filenames
         loggerData.lineNumbersEnabled = options.filenames && options.lineNumbers
         loggerData.functionNamesEnabled = options.filenames && options.functionNames
         loggerData.timestampsEnabled = options.timestamps
     }
 
-    fun getNamespaces(loggerData: TraceInternals.LoggerData): List<String> =
+    fun getNamespaces(loggerData: LoggerData): List<String> =
         synchronized(loggerData.registryLock) { loggerData.namespaces.toList().sorted() }
 
-    fun getChannels(loggerData: TraceInternals.LoggerData, traceNamespace: String): List<String> {
+    fun getChannels(loggerData: LoggerData, traceNamespace: String): List<String> {
         val namespaceName = TraceNamingSupport.normalizeNamespace(traceNamespace)
         return synchronized(loggerData.registryLock) {
             loggerData.channelsByNamespace[namespaceName]?.toList()?.sorted() ?: emptyList()
         }
     }
 
-    fun shouldTraceChannel(traceLogger: TraceInternals.TraceLoggerData, channel: String): Boolean =
+    fun shouldTraceChannel(traceLogger: TraceLoggerData, channel: String): Boolean =
         try {
             val logger = attachedLogger(traceLogger) ?: return false
             shouldTraceChannel(logger, traceLogger.traceNamespace, TraceNamingSupport.normalizeChannel(channel))
@@ -119,7 +119,7 @@ object TraceRegistrySupport {
         }
 
     fun shouldTraceQualifiedChannel(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         qualifiedChannel: String,
         localNamespace: String,
     ): Boolean =
@@ -130,7 +130,7 @@ object TraceRegistrySupport {
             false
         }
 
-    fun shouldTraceChannel(loggerData: TraceInternals.LoggerData, traceNamespace: String, channel: String): Boolean {
+    fun shouldTraceChannel(loggerData: LoggerData, traceNamespace: String, channel: String): Boolean {
         if (!TraceNamingSupport.isValidChannelPath(channel) || !loggerData.hasEnabledChannels.get()) {
             return false
         }
@@ -141,7 +141,7 @@ object TraceRegistrySupport {
         return synchronized(loggerData.enabledLock) { loggerData.enabledChannelKeys.contains(key) }
     }
 
-    fun isRegisteredTraceChannel(loggerData: TraceInternals.LoggerData, traceNamespace: String, channel: String): Boolean {
+    fun isRegisteredTraceChannel(loggerData: LoggerData, traceNamespace: String, channel: String): Boolean {
         val namespaceName = TraceNamingSupport.trimWhitespace(traceNamespace)
         val channelName = TraceNamingSupport.trimWhitespace(channel)
         if (!TraceNamingSupport.isSelectorIdentifier(namespaceName) || !TraceNamingSupport.isValidChannelPath(channelName)) {
@@ -152,7 +152,7 @@ object TraceRegistrySupport {
         }
     }
 
-    fun enableChannelKeys(loggerData: TraceInternals.LoggerData, channelKeys: List<String>) {
+    fun enableChannelKeys(loggerData: LoggerData, channelKeys: List<String>) {
         synchronized(loggerData.enabledLock) {
             for (key in channelKeys) {
                 if (key.isNotEmpty()) {
@@ -163,14 +163,14 @@ object TraceRegistrySupport {
         }
     }
 
-    fun disableChannelKeys(loggerData: TraceInternals.LoggerData, channelKeys: List<String>) {
+    fun disableChannelKeys(loggerData: LoggerData, channelKeys: List<String>) {
         synchronized(loggerData.enabledLock) {
             loggerData.enabledChannelKeys.removeAll(channelKeys.toSet())
             loggerData.hasEnabledChannels.set(loggerData.enabledChannelKeys.isNotEmpty())
         }
     }
 
-    private fun findChannelSpec(data: TraceInternals.TraceLoggerData, channelName: String): TraceInternals.ChannelSpec? =
+    private fun findChannelSpec(data: TraceLoggerData, channelName: String): ChannelSpec? =
         data.channels.firstOrNull { it.name == channelName }
 
     private fun mergeColor(existingColor: Int, newColor: Int, traceNamespace: String, channelName: String): Int {

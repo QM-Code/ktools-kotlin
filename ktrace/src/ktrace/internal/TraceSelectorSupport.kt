@@ -2,10 +2,10 @@ package ktrace.internal
 
 object TraceSelectorSupport {
     fun resolveExactChannel(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         qualifiedChannel: String,
         localNamespace: String,
-    ): TraceInternals.ExactChannelResolution {
+    ): ExactChannelResolution {
         val qualified = TraceNamingSupport.trimWhitespace(qualifiedChannel)
         val dot = qualified.indexOf('.')
         require(dot >= 0) {
@@ -17,7 +17,7 @@ object TraceSelectorSupport {
         require(TraceNamingSupport.isSelectorIdentifier(traceNamespace)) { "invalid trace namespace '$traceNamespace'" }
         require(TraceNamingSupport.isValidChannelPath(channel)) { "invalid trace channel '$channel'" }
         val key = TraceNamingSupport.makeQualifiedChannelKey(traceNamespace, channel)
-        return TraceInternals.ExactChannelResolution(
+        return ExactChannelResolution(
             key,
             traceNamespace,
             channel,
@@ -26,10 +26,10 @@ object TraceSelectorSupport {
     }
 
     fun resolveSelectorExpression(
-        loggerData: TraceInternals.LoggerData,
+        loggerData: LoggerData,
         selectorsCsv: String,
         localNamespace: String,
-    ): TraceInternals.SelectorResolution {
+    ): SelectorResolution {
         val selectorText = TraceNamingSupport.trimWhitespace(selectorsCsv)
         require(selectorText.isNotEmpty()) { "EnableChannels requires one or more selectors" }
 
@@ -57,8 +57,8 @@ object TraceSelectorSupport {
         value: String,
         localNamespace: String,
         invalidTokens: MutableList<String>,
-    ): List<TraceInternals.Selector> {
-        val selectors = mutableListOf<TraceInternals.Selector>()
+    ): List<Selector> {
+        val selectors = mutableListOf<Selector>()
         val selectorTokens = mutableListOf<String>()
         val splitError = splitByTopLevelCommas(value, selectorTokens)
         if (splitError != null) {
@@ -101,9 +101,9 @@ object TraceSelectorSupport {
     }
 
     private fun resolveSelectorsToChannelKeys(
-        loggerData: TraceInternals.LoggerData,
-        selectors: List<TraceInternals.Selector>,
-    ): TraceInternals.SelectorResolution {
+        loggerData: LoggerData,
+        selectors: List<Selector>,
+    ): SelectorResolution {
         val channelKeys = mutableListOf<String>()
         val unmatchedSelectors = mutableListOf<String>()
         val seenKeys = linkedSetOf<String>()
@@ -137,10 +137,10 @@ object TraceSelectorSupport {
             }
         }
 
-        return TraceInternals.SelectorResolution(channelKeys, unmatchedSelectors)
+        return SelectorResolution(channelKeys, unmatchedSelectors)
     }
 
-    private fun parseSelector(rawToken: String, localNamespace: String): TraceInternals.Selector {
+    private fun parseSelector(rawToken: String, localNamespace: String): Selector {
         val dot = rawToken.indexOf('.')
         require(dot >= 0) { "did you mean '.*'?" }
 
@@ -165,10 +165,10 @@ object TraceSelectorSupport {
             require(token == "*" || TraceNamingSupport.isSelectorIdentifier(token)) { "invalid channel token '$token'" }
         }
         val includeTopLevel = tokens.size == 2 && tokens[0] == "*" && tokens[1] == "*"
-        return TraceInternals.Selector(anyNamespace, traceNamespace, tokens.toList(), includeTopLevel)
+        return Selector(anyNamespace, traceNamespace, tokens.toList(), includeTopLevel)
     }
 
-    private fun matchesSelector(selector: TraceInternals.Selector, traceNamespace: String, channel: String): Boolean {
+    private fun matchesSelector(selector: Selector, traceNamespace: String, channel: String): Boolean {
         if (!selector.anyNamespace && traceNamespace != selector.traceNamespace) {
             return false
         }
@@ -286,7 +286,7 @@ object TraceSelectorSupport {
         }
     }
 
-    private fun formatSelector(selector: TraceInternals.Selector): String =
+    private fun formatSelector(selector: Selector): String =
         buildString {
             append(if (selector.anyNamespace) "*" else selector.traceNamespace)
             append('.')

@@ -2,10 +2,10 @@ package ktrace
 
 import kcli.InlineParser
 import ktrace.internal.TraceInternals
-import ktrace.internal.TraceInternals.CallSite
-import ktrace.internal.TraceInternals.LogSeverity
-import ktrace.internal.TraceInternals.LoggerData
-import ktrace.internal.TraceInternals.TraceLoggerData
+import ktrace.internal.CallSite
+import ktrace.internal.LogSeverity
+import ktrace.internal.LoggerData
+import ktrace.internal.TraceLoggerData
 
 class OutputOptions(
     filenames: Boolean,

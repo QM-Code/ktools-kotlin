@@ -5,21 +5,21 @@ Assume these have already been read:
 
 `ktools-kotlin/kcli/` is the Kotlin implementation of `kcli`.
 
-## What This Repo Owns
+## What This Component Owns
 
-This repo owns the Kotlin API and implementation details for `kcli`, including:
+This component owns the Kotlin API and implementation details for `kcli`, including:
 
 - public Kotlin APIs
 - parser and inline-parser behavior
 - Kotlin demos and tests
-- repo-local build configuration for the Kotlin workspace
+- component-local build configuration for the Kotlin workspace
 
 Cross-language conceptual behavior belongs to the `ktools/` overview docs.
 Kotlin workspace concerns belong to `ktools-kotlin/`.
 
 ## Build And Test Expectations
 
-- Use `kbuild` from the repo root.
+- Use `kbuild` from the component root.
 - Prefer end-to-end checks through the generated demo launchers.
 - Keep tests focused on parsing behavior and CLI ergonomics.
 

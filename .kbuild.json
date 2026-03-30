@@ -8,7 +8,7 @@
     "auth": "git@github.com:QM-Code/ktools-kotlin.git"
   },
   "batch": {
-    "repos": [
+    "targets": [
       "kcli",
       "ktrace"
     ]

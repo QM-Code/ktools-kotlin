@@ -5,9 +5,9 @@ Assume these have already been read:
 
 `ktools-kotlin/ktrace/` is the Kotlin implementation of `ktrace`.
 
-## What This Repo Owns
+## What This Component Owns
 
-This repo owns the Kotlin API and implementation details for `ktrace`, including:
+This component owns the Kotlin API and implementation details for `ktrace`, including:
 
 - public Kotlin tracing/logging APIs
 - selector parsing and logger runtime behavior
@@ -19,7 +19,7 @@ Kotlin workspace concerns belong to `ktools-kotlin/`.
 
 ## Build And Test Expectations
 
-- Use `kbuild` from the repo root.
+- Use `kbuild` from the component root.
 - Prefer end-to-end checks through the generated demo launchers.
 - Keep tests explicit and trace-focused.
 
